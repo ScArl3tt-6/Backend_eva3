@@ -1,0 +1,56 @@
+# ============================================================
+# requirements.txt — DEPENDENCIAS DEL PROYECTO
+# Proyecto: FitLife (EVA-3 Desarrollo Backend)
+# Alumna: Genesis Quezada Sanzana
+#
+# Versiones fijadas con "pip freeze" sobre un entorno Python 3.12.10,
+# la misma versión mayor que corre en el servidor (Ubuntu 24.04).
+#
+# Instalación en PowerShell:
+#   py -3.12 -m venv .venv
+#   .\.venv\Scripts\Activate.ps1
+#   python -m pip install --upgrade pip
+#   pip install -r requirements.txt
+# ============================================================
+
+# --- Framework web ---
+Django==5.2.17
+
+# --- API REST ---
+djangorestframework==3.18.1
+djangorestframework_simplejwt==5.5.1
+PyJWT==2.15.1
+
+# --- Filtros de consulta ---
+django-filter==26.2
+
+# --- Documentación OpenAPI 3 (Swagger UI y ReDoc) ---
+drf-spectacular==0.30.0
+inflection==0.5.1
+jsonschema==4.26.0
+jsonschema-specifications==2025.9.1
+referencing==0.37.0
+rpds-py==2026.9.1
+uritemplate==4.2.0
+PyYAML==6.0.3
+attrs==26.1.0
+
+# --- PostgreSQL (driver psycopg 3) ---
+psycopg==3.3.6
+psycopg-binary==3.3.6
+
+# --- Configuración por variables de entorno (.env) ---
+python-decouple==3.8
+
+# --- Generación de códigos QR en SVG (sin depender de Pillow) ---
+qrcode==8.2
+colorama==0.4.6
+
+# --- Servidor de aplicación WSGI para producción (systemd/Nginx) ---
+gunicorn==26.2.0
+
+# --- Dependencias internas de Django ---
+asgiref==3.13.0
+sqlparse==0.6.0
+typing_extensions==4.16.0
+tzdata==2026.5
