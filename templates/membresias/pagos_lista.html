@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="tarjeta">
+  <div class="tarjeta-cabecera">
+    <h2><i class="bi bi-cash-coin" aria-hidden="true"></i> Pagos</h2>
+    <a href="{% url 'pago-crear' %}" class="btn btn-primary">
+      <i class="bi bi-plus-lg" aria-hidden="true"></i> Registrar pago
+    </a>
+  </div>
+  <div class="tarjeta-cuerpo">
+    {% if pagos %}
+      <div class="tabla-responsiva">
+        <table class="tabla-fl">
+          <thead>
+            <tr><th>Comprobante</th><th>Socio</th><th>Plan</th><th>Monto</th><th>Método</th><th>Fecha</th></tr>
+          </thead>
+          <tbody>
+            {% for pago in pagos %}
+              <tr>
+                <td><span class="codigo-corto">{{ pago.comprobante }}</span></td>
+                <td>{{ pago.socio }}</td>
+                <td>{{ pago.plan.nombre }}</td>
+                <td class="numerico">${{ pago.monto|floatformat:0 }}</td>
+                <td>{{ pago.get_metodo_display }}</td>
+                <td>{{ pago.fecha }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="estado-vacio">
+        <i class="bi bi-cash-coin icono" aria-hidden="true"></i>
+        <h3>Todavía no hay pagos registrados</h3>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

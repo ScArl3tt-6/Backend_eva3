@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="tarjeta">
+  <div class="tarjeta-cabecera">
+    <h2><i class="bi bi-card-checklist" aria-hidden="true"></i> Membresías</h2>
+  </div>
+  <div class="tarjeta-cuerpo">
+    {% if membresias %}
+      <div class="tabla-responsiva">
+        <table class="tabla-fl">
+          <thead>
+            <tr><th>Socio</th><th>Plan</th><th>Estado</th><th>Inicio</th><th>Término</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for membresia in membresias %}
+              <tr>
+                <td>{{ membresia.socio }}</td>
+                <td>{{ membresia.plan.nombre }}</td>
+                <td>
+                  <span class="badge-fl badge-membresia-{{ membresia.estado|lower }}">
+                    {{ membresia.get_estado_display }}
+                  </span>
+                </td>
+                <td>{{ membresia.fecha_inicio }}</td>
+                <td>{{ membresia.fecha_fin }}</td>
+                <td><a href="{% url 'membresia-detalle' membresia.id %}" class="btn btn-sm btn-light-fl">Ver</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="estado-vacio">
+        <i class="bi bi-card-checklist icono" aria-hidden="true"></i>
+        <h3>No hay membresías para mostrar</h3>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

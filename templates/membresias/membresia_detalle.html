@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="tarjeta">
+      <div class="tarjeta-cabecera">
+        <h2><i class="bi bi-card-checklist" aria-hidden="true"></i> {{ membresia.plan.nombre }}</h2>
+        <span class="badge-fl badge-membresia-{{ membresia.estado|lower }}">{{ membresia.get_estado_display }}</span>
+      </div>
+      <div class="tarjeta-cuerpo">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <p class="dato-etiqueta">Socio</p>
+            <p class="dato-valor">{{ membresia.socio }}</p>
+          </div>
+          <div class="col-md-6">
+            <p class="dato-etiqueta">Vigencia</p>
+            <p class="dato-valor">{{ membresia.fecha_inicio }} al {{ membresia.fecha_fin }}</p>
+          </div>
+          {% if membresia.dias_congelados %}
+            <div class="col-md-6">
+              <p class="dato-etiqueta">Días congelados</p>
+              <p class="dato-valor">{{ membresia.dias_congelados }} (desde {{ membresia.fecha_congelamiento }})</p>
+            </div>
+          {% endif %}
+        </div>
+
+        {% if user.es_administrador or user.es_recepcion %}
+          <hr class="separador-suave">
+          {% if membresia.estado == "ACTIVA" %}
+            <form method="post" action="{% url 'membresia-congelar' membresia.id %}" class="d-flex gap-2 align-items-start">
+              {% csrf_token %}
+              <div>
+                {{ congelar_form.dias }}
+                {% for error in congelar_form.dias.errors %}<div class="error-campo">{{ error }}</div>{% endfor %}
+              </div>
+              <button type="submit" class="btn btn-outline-primary">
+                <i class="bi bi-snow2" aria-hidden="true"></i> Congelar
+              </button>
+            </form>
+          {% elif membresia.estado == "CONGELADA" %}
+            <form method="post" action="{% url 'membresia-descongelar' membresia.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-primary">
+                <i class="bi bi-sun" aria-hidden="true"></i> Descongelar
+              </button>
+            </form>
+          {% endif %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="tarjeta">
+      <div class="tarjeta-cabecera"><h3><i class="bi bi-clock-history" aria-hidden="true"></i> Historial</h3></div>
+      <div class="tarjeta-cuerpo">
+        <ul class="linea-tiempo">
+          {% for hecho in historial %}
+            <li>
+              <span class="fecha">{{ hecho.fecha }}</span>
+              <strong>{{ hecho.estado_anterior|default:"—" }} → {{ hecho.estado_nuevo }}</strong>
+              <p class="observacion">{{ hecho.observacion }}</p>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
