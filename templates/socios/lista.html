@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="tarjeta">
+  <div class="tarjeta-cabecera">
+    <h2><i class="bi bi-people" aria-hidden="true"></i> Socios</h2>
+    <a href="{% url 'socio-crear' %}" class="btn btn-primary">
+      <i class="bi bi-person-plus" aria-hidden="true"></i> Nuevo socio
+    </a>
+  </div>
+  <div class="tarjeta-cuerpo">
+    <form method="get" class="mb-3">
+      <div class="input-group">
+        <input type="text" name="q" value="{{ busqueda }}" class="form-control" placeholder="Buscar por RUT o usuario...">
+        <button type="submit" class="btn btn-outline-primary"><i class="bi bi-search" aria-hidden="true"></i></button>
+      </div>
+    </form>
+
+    {% if socios %}
+      <div class="tabla-responsiva">
+        <table class="tabla-fl">
+          <thead>
+            <tr><th>RUT</th><th>Nombre</th><th>Usuario</th><th>Teléfono</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for socio in socios %}
+              <tr>
+                <td>{{ socio.rut }}</td>
+                <td>{{ socio.usuario.nombre_completo }}</td>
+                <td>{{ socio.usuario.username }}</td>
+                <td>{{ socio.telefono|default:"—" }}</td>
+                <td><a href="{% url 'socio-detalle' socio.id %}" class="btn btn-sm btn-light-fl">Ver</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="estado-vacio">
+        <i class="bi bi-people icono" aria-hidden="true"></i>
+        <h3>No hay socios que coincidan con la búsqueda</h3>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

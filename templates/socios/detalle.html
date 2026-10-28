@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="tarjeta">
+  <div class="tarjeta-cabecera">
+    <h2><i class="bi bi-person" aria-hidden="true"></i> {{ socio.usuario.nombre_completo }}</h2>
+    {% if user.es_administrador or user.es_recepcion %}
+      <a href="{% url 'socio-editar' socio.id %}" class="btn btn-light-fl">
+        <i class="bi bi-pencil-square" aria-hidden="true"></i> Editar
+      </a>
+    {% endif %}
+  </div>
+  <div class="tarjeta-cuerpo">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <p class="dato-etiqueta">RUT</p>
+        <p class="dato-valor">{{ socio.rut }}</p>
+      </div>
+      <div class="col-md-4">
+        <p class="dato-etiqueta">Usuario</p>
+        <p class="dato-valor">{{ socio.usuario.username }}</p>
+      </div>
+      <div class="col-md-4">
+        <p class="dato-etiqueta">Correo</p>
+        <p class="dato-valor">{{ socio.usuario.email }}</p>
+      </div>
+      <div class="col-md-4">
+        <p class="dato-etiqueta">Teléfono</p>
+        <p class="dato-valor">{{ socio.telefono|default:"—" }}</p>
+      </div>
+      <div class="col-md-4">
+        <p class="dato-etiqueta">Contacto de emergencia</p>
+        <p class="dato-valor">{{ socio.contacto_emergencia_nombre|default:"—" }} {{ socio.contacto_emergencia_telefono }}</p>
+      </div>
+    </div>
+
+    <hr class="separador-suave">
+    <div class="d-flex flex-wrap gap-2">
+      <a href="{% url 'membresias-de-socio' socio.id %}" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-card-checklist" aria-hidden="true"></i> Ver membresías y pagos
+      </a>
+      <a href="{% url 'accesos-de-socio' socio.id %}" class="btn btn-outline-primary btn-sm">
+        <i class="bi bi-door-open" aria-hidden="true"></i> Ver historial de accesos
+      </a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

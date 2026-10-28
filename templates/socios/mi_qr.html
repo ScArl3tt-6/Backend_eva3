@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block bajada %}<p class="bajada">Muéstralo en recepción para registrar tu entrada o salida.</p>{% endblock %}
+{% block contenido %}
+
+<div class="row justify-content-center">
+  <div class="col-md-6 text-center">
+    <div class="tarjeta">
+      <div class="tarjeta-cuerpo">
+        <div class="qr-marco mb-3">
+          <img src="{% url 'socio-qr-svg' socio.id %}" alt="Código QR de acceso" width="240" height="240">
+        </div>
+        <p class="texto-suave texto-chico">
+          Este código identifica tu cuenta sin exponer tu RUT ni tu nombre.
+          Si crees que alguien más lo tiene, regénéralo: el anterior dejará
+          de funcionar de inmediato.
+        </p>
+        <form method="post" action="{% url 'socio-mi-qr-regenerar' %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-repeat" aria-hidden="true"></i> Regenerar código QR
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
