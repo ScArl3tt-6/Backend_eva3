@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="tarjeta">
+  <div class="tarjeta-cabecera">
+    <h2><i class="bi bi-tags" aria-hidden="true"></i> Tipos de clase</h2>
+    <a href="{% url 'tipo-clase-crear' %}" class="btn btn-primary">
+      <i class="bi bi-plus-lg" aria-hidden="true"></i> Nuevo tipo
+    </a>
+  </div>
+  <div class="tarjeta-cuerpo">
+    {% if tipos %}
+      <ul class="lista-limpia">
+        {% for tipo in tipos %}
+          <li class="mb-2"><strong>{{ tipo.nombre }}</strong> — <span class="texto-suave">{{ tipo.descripcion }}</span></li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="estado-vacio">
+        <i class="bi bi-tags icono" aria-hidden="true"></i>
+        <h3>Todavía no hay tipos de clase</h3>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

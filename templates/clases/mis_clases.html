@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="tarjeta">
+  <div class="tarjeta-cabecera"><h2><i class="bi bi-easel" aria-hidden="true"></i> Mis clases</h2></div>
+  <div class="tarjeta-cuerpo">
+    {% if clases %}
+      <div class="tabla-responsiva">
+        <table class="tabla-fl">
+          <thead><tr><th>Tipo</th><th>Sala</th><th>Horario</th><th>Cupos</th><th></th></tr></thead>
+          <tbody>
+            {% for clase in clases %}
+              <tr>
+                <td>{{ clase.tipo.nombre }}</td>
+                <td>{{ clase.sala }}</td>
+                <td>{{ clase.inicio|date:"d-m-Y H:i" }}</td>
+                <td>{{ clase.cupos_confirmados }}/{{ clase.cupo_maximo }}</td>
+                <td><a href="{% url 'clase-detalle' clase.id %}" class="btn btn-sm btn-light-fl">Ver / marcar asistencia</a></td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="estado-vacio">
+        <i class="bi bi-easel icono" aria-hidden="true"></i>
+        <h3>No tienes clases asignadas</h3>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

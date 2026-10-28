@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="tarjeta">
+  <div class="tarjeta-cabecera"><h2><i class="bi bi-calendar-check" aria-hidden="true"></i> Mis reservas</h2></div>
+  <div class="tarjeta-cuerpo">
+    {% if reservas %}
+      <div class="tabla-responsiva">
+        <table class="tabla-fl">
+          <thead><tr><th>Clase</th><th>Fecha</th><th>Estado</th><th></th></tr></thead>
+          <tbody>
+            {% for reserva in reservas %}
+              <tr>
+                <td>{{ reserva.clase.tipo.nombre }}</td>
+                <td>{{ reserva.clase.inicio|date:"d-m-Y H:i" }}</td>
+                <td>
+                  <span class="badge-fl badge-reserva-{{ reserva.estado|lower }}">
+                    {{ reserva.get_estado_display }}
+                    {% if reserva.posicion_espera %}(pos. {{ reserva.posicion_espera }}){% endif %}
+                  </span>
+                </td>
+                <td>
+                  {% if reserva.estado == "CONFIRMADA" or reserva.estado == "EN_ESPERA" %}
+                    <form method="post" action="{% url 'reserva-cancelar-vista' reserva.id %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn btn-sm btn-outline-primary">Cancelar</button>
+                    </form>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="estado-vacio">
+        <i class="bi bi-calendar-check icono" aria-hidden="true"></i>
+        <h3>Todavía no tienes reservas</h3>
+        <a href="{% url 'clases-lista' %}" class="btn btn-primary">Ver clases disponibles</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

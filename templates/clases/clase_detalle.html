@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="row g-3">
+  <div class="col-lg-7">
+    <div class="tarjeta">
+      <div class="tarjeta-cabecera">
+        <h2><i class="bi bi-calendar2-week" aria-hidden="true"></i> {{ clase.tipo.nombre }}</h2>
+        <span class="badge-fl badge-neutro">{{ clase.get_estado_display }}</span>
+      </div>
+      <div class="tarjeta-cuerpo">
+        <div class="row g-3 mb-3">
+          <div class="col-md-6"><p class="dato-etiqueta">Instructor</p><p class="dato-valor">{{ clase.instructor.nombre_completo }}</p></div>
+          <div class="col-md-6"><p class="dato-etiqueta">Sala</p><p class="dato-valor">{{ clase.sala }}</p></div>
+          <div class="col-md-6"><p class="dato-etiqueta">Horario</p><p class="dato-valor">{{ clase.inicio|date:"d-m-Y H:i" }} – {{ clase.fin|date:"H:i" }}</p></div>
+          <div class="col-md-6"><p class="dato-etiqueta">Cupos</p><p class="dato-valor">{{ clase.cupos_confirmados }}/{{ clase.cupo_maximo }} ({{ clase.en_lista_de_espera }} en espera)</p></div>
+        </div>
+
+        {% if user.es_socio %}
+          <hr class="separador-suave">
+          {% if reserva_propia %}
+            <span class="badge-fl badge-reserva-{{ reserva_propia.estado|lower }} mb-2 d-inline-block">
+              {{ reserva_propia.get_estado_display }}
+              {% if reserva_propia.posicion_espera %}(posición {{ reserva_propia.posicion_espera }}){% endif %}
+            </span><br>
+            <form method="post" action="{% url 'reserva-cancelar-vista' reserva_propia.id %}">
+              {% csrf_token %}
+              <input type="hidden" name="volver" value="{% url 'clase-detalle' clase.id %}">
+              <button type="submit" class="btn btn-outline-primary">
+                <i class="bi bi-x-circle" aria-hidden="true"></i> Cancelar mi reserva
+              </button>
+            </form>
+          {% elif clase.estado == "PROGRAMADA" %}
+            <form method="post" action="{% url 'clase-reservar' clase.id %}">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-primary">
+                <i class="bi bi-calendar-check" aria-hidden="true"></i> Reservar
+              </button>
+            </form>
+          {% endif %}
+        {% endif %}
+
+        {% if user.es_administrador or user.es_recepcion %}
+          <hr class="separador-suave">
+          <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'clase-editar' clase.id %}" class="btn btn-light-fl">
+              <i class="bi bi-pencil-square" aria-hidden="true"></i> Editar
+            </a>
+            {% if clase.estado != "CANCELADA" %}
+              <form method="post" action="{% url 'clase-cancelar-vista' clase.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                  <i class="bi bi-x-octagon" aria-hidden="true"></i> Cancelar clase
+                </button>
+              </form>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-5">
+    <div class="tarjeta">
+      <div class="tarjeta-cabecera"><h3><i class="bi bi-people" aria-hidden="true"></i> Reservas</h3></div>
+      <div class="tarjeta-cuerpo">
+        {% for reserva in reservas %}
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+              <strong>{{ reserva.socio }}</strong>
+              {% if reserva.posicion_espera %}<span class="texto-chico texto-suave"> — posición {{ reserva.posicion_espera }}</span>{% endif %}
+            </div>
+            <span class="badge-fl badge-reserva-{{ reserva.estado|lower }}">{{ reserva.get_estado_display }}</span>
+          </div>
+          {% if user.es_instructor and reserva.estado == "CONFIRMADA" %}
+            <form method="post" action="{% url 'reserva-asistencia-vista' reserva.id %}" class="d-flex gap-2 mb-2">
+              {% csrf_token %}
+              <button type="submit" name="asistio" value="1" class="btn btn-sm btn-success">Asistió</button>
+              <button type="submit" name="asistio" value="0" class="btn btn-sm btn-outline-primary">No asistió</button>
+            </form>
+          {% endif %}
+          <hr class="separador-suave">
+        {% empty %}
+          <p class="texto-suave">Todavía no hay reservas.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

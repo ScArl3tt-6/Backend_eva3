@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="tarjeta">
+  <div class="tarjeta-cabecera">
+    <h2><i class="bi bi-calendar2-week" aria-hidden="true"></i> Clases</h2>
+    {% if user.es_administrador or user.es_recepcion %}
+      <a href="{% url 'clase-crear' %}" class="btn btn-primary">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i> Nueva clase
+      </a>
+    {% endif %}
+  </div>
+  <div class="tarjeta-cuerpo">
+    {% if clases %}
+      <div class="row g-3">
+        {% for clase in clases %}
+          <div class="col-md-6 col-lg-4">
+            <div class="tarjeta h-100">
+              <div class="tarjeta-cuerpo">
+                <div class="d-flex justify-content-between align-items-start">
+                  <h3 class="mb-1">{{ clase.tipo.nombre }}</h3>
+                  <span class="badge-fl badge-neutro">{{ clase.get_estado_display }}</span>
+                </div>
+                <p class="texto-chico texto-suave mb-1"><i class="bi bi-person" aria-hidden="true"></i> {{ clase.instructor.nombre_completo }}</p>
+                <p class="texto-chico texto-suave mb-1"><i class="bi bi-geo-alt" aria-hidden="true"></i> {{ clase.sala }}</p>
+                <p class="texto-chico mb-2"><i class="bi bi-clock" aria-hidden="true"></i> {{ clase.inicio|date:"d-m-Y H:i" }}</p>
+                <p class="texto-chico mb-2">
+                  Cupos: {{ clase.cupos_confirmados }}/{{ clase.cupo_maximo }}
+                  {% if clase.en_lista_de_espera %}· {{ clase.en_lista_de_espera }} en espera{% endif %}
+                </p>
+
+                {% if user.es_socio and clase.mi_reserva %}
+                  <span class="badge-fl badge-reserva-{{ clase.mi_reserva.estado|lower }} d-block mb-2">
+                    {{ clase.mi_reserva.get_estado_display }}
+                    {% if clase.mi_reserva.posicion_espera %}(posición {{ clase.mi_reserva.posicion_espera }}){% endif %}
+                  </span>
+                {% endif %}
+
+                <a href="{% url 'clase-detalle' clase.id %}" class="btn btn-sm btn-light-fl">Ver detalle</a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="estado-vacio">
+        <i class="bi bi-calendar2-week icono" aria-hidden="true"></i>
+        <h3>No hay clases programadas</h3>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
