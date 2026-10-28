@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% comment %} ============================================================
+   parciales/formulario.html — FORMULARIO GENÉRICO DE GESTIÓN
+   Dibuja cualquier Form/ModelForm del sitio con el mismo aspecto:
+   título, descripción, errores generales, campo por campo con su
+   ayuda y su error, y los botones de guardar/cancelar.
+   ============================================================ {% endcomment %}
+{% block contenido %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="tarjeta">
+
+      <div class="tarjeta-cabecera">
+        <h2>
+          <span class="icono-modulo" aria-hidden="true"><i class="bi {{ icono|default:'bi-pencil-square' }}"></i></span>
+          {{ titulo_pagina }}
+        </h2>
+      </div>
+
+      <div class="tarjeta-cuerpo">
+        {% if descripcion_formulario %}
+          <p class="texto-suave">{{ descripcion_formulario }}</p>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% if formulario.non_field_errors %}
+            <div class="alert alert-danger" role="alert">
+              <i class="bi bi-exclamation-octagon-fill flex-shrink-0 mt-1" aria-hidden="true"></i>
+              <div>
+                {% for error in formulario.non_field_errors %}
+                  <div>{{ error }}</div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+          {% for campo in formulario %}
+            <div class="mb-3 {% if campo.errors %}campo-con-error{% endif %}">
+              {% if campo.field.widget.input_type == 'checkbox' %}
+                <div class="form-check">
+                  {{ campo }}
+                  <label class="form-check-label" for="{{ campo.id_for_label }}">{{ campo.label }}</label>
+                </div>
+              {% else %}
+                <label class="form-label" for="{{ campo.id_for_label }}">
+                  {{ campo.label }}
+                  {% if campo.field.required %}<span class="text-danger" aria-hidden="true">*</span>{% endif %}
+                </label>
+                {{ campo }}
+              {% endif %}
+
+              {% if campo.help_text %}
+                <div class="form-text">{{ campo.help_text }}</div>
+              {% endif %}
+
+              {% for error in campo.errors %}
+                <div class="error-campo">
+                  <i class="bi bi-exclamation-circle-fill" aria-hidden="true"></i>
+                  <span>{{ error }}</span>
+                </div>
+              {% endfor %}
+            </div>
+          {% endfor %}
+
+          <p class="texto-tenue texto-mini">
+            Los campos marcados con <span class="text-danger">*</span> son obligatorios.
+          </p>
+
+          <hr class="separador-suave">
+          <div class="d-flex flex-wrap gap-2 justify-content-end">
+            <a href="{{ url_cancelar }}" class="btn btn-light-fl">
+              <i class="bi bi-x-lg" aria-hidden="true"></i> Cancelar
+            </a>
+            <button type="submit" class="btn btn-primary">
+              <i class="bi bi-check-lg" aria-hidden="true"></i> {{ texto_boton|default:"Guardar" }}
+            </button>
+          </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

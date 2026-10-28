@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<section class="portada mb-4">
+  <h1><i class="bi bi-activity" aria-hidden="true"></i> {{ nombre_comercial }}</h1>
+  <p>
+    Plataforma de control de asistencia y reserva de clases para gimnasios:
+    valida el acceso de cada socio con su código QR, controla el aforo en
+    tiempo real y organiza las clases grupales con cupos y lista de espera,
+    sin sobrecupo ni ingresos con membresías vencidas.
+  </p>
+  {% if not user.is_authenticated %}
+    <a href="{% url 'usuarios:login' %}" class="btn btn-light-fl mt-2">
+      <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Iniciar sesión
+    </a>
+  {% else %}
+    <a href="{% url 'core:panel' %}" class="btn btn-light-fl mt-2">
+      <i class="bi bi-speedometer2" aria-hidden="true"></i> Ir a mi panel
+    </a>
+  {% endif %}
+</section>
+
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="tarjeta h-100">
+      <div class="tarjeta-cuerpo">
+        <span class="icono-modulo mb-3"><i class="bi bi-qr-code-scan" aria-hidden="true"></i></span>
+        <h3>Acceso por QR</h3>
+        <p class="texto-suave mb-0">
+          Cada socio ingresa con un código QR único. El sistema valida su
+          membresía al instante y evita el antipassback.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="tarjeta h-100">
+      <div class="tarjeta-cuerpo">
+        <span class="icono-modulo secundario mb-3"><i class="bi bi-calendar2-check" aria-hidden="true"></i></span>
+        <h3>Reserva de clases</h3>
+        <p class="texto-suave mb-0">
+          Cupos controlados por clase, con lista de espera automática que
+          promueve al primero en la fila cuando alguien cancela.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="tarjeta h-100">
+      <div class="tarjeta-cuerpo">
+        <span class="icono-modulo acento mb-3"><i class="bi bi-speedometer2" aria-hidden="true"></i></span>
+        <h3>Aforo en tiempo real</h3>
+        <p class="texto-suave mb-0">
+          Recepción ve cuántas personas hay dentro del gimnasio en todo
+          momento, sin recargar la página.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

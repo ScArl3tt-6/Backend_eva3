@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block titulo %}Página no encontrada · {{ nombre_comercial }}{% endblock %}
+{% block encabezado %}{% endblock %}
+{% block contenido %}
+
+<div class="tarjeta caja-error">
+  <div class="tarjeta-cuerpo">
+    <span class="icono-grande"><i class="bi bi-signpost-split" aria-hidden="true"></i></span>
+    <h1>Esta página no existe</h1>
+    <p class="texto-suave">
+      La dirección que escribiste no corresponde a ninguna pantalla de
+      {{ nombre_comercial }}. Revisa la URL o vuelve al inicio.
+    </p>
+    <a href="{% url 'core:inicio' %}" class="btn btn-primary mt-2">
+      <i class="bi bi-house-door" aria-hidden="true"></i> Volver al inicio
+    </a>
+  </div>
+</div>
+
+{% endblock %}

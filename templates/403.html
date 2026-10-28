@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block titulo %}Acceso denegado · {{ nombre_comercial }}{% endblock %}
+{% block encabezado %}{% endblock %}
+{% block contenido %}
+
+<div class="tarjeta caja-error">
+  <div class="tarjeta-cuerpo">
+    <span class="icono-grande"><i class="bi bi-shield-lock" aria-hidden="true"></i></span>
+    <h1>No tienes permiso para ver esta página</h1>
+    <p class="texto-suave">
+      Tu rol
+      {% if user.is_authenticated %}(<strong>{{ user.get_rol_display }}</strong>){% endif %}
+      no está autorizado para esta acción. Si crees que es un error,
+      contacta a un administrador.
+    </p>
+    <a href="{% url 'core:inicio' %}" class="btn btn-primary mt-2">
+      <i class="bi bi-house-door" aria-hidden="true"></i> Volver al inicio
+    </a>
+  </div>
+</div>
+
+{% endblock %}

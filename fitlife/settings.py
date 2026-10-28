@@ -90,9 +90,13 @@ TERCEROS_APPS = [
     "drf_spectacular",
 ]
 
-# Se completa en cada fase: usuarios, socios, membresias, accesos, clases.
 APPS_NEGOCIO = [
     "core.apps.CoreConfig",
+    "usuarios.apps.UsuariosConfig",
+    "socios.apps.SociosConfig",
+    "membresias.apps.MembresiasConfig",
+    "accesos.apps.AccesosConfig",
+    "clases.apps.ClasesConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + TERCEROS_APPS + APPS_NEGOCIO
@@ -158,11 +162,30 @@ DATABASES = {
 
 
 # ============================================================
-# BLOQUE 8 — MODELO DE USUARIO PERSONALIZADO
-# Se define en la fase de la app "usuarios" (AUTH_USER_MODEL =
-# "usuarios.Usuario"), antes de ejecutar cualquier migración real,
-# para no tener que migrar un modelo de usuario a mitad de camino.
+# BLOQUE 7-B — REGLAS DE NEGOCIO CONFIGURABLES
+# Los servicios.py de cada app leen estos valores desde settings
+# (nunca llaman a decouple directamente), para que todo el .env se
+# resuelva en un único lugar del proyecto.
+#
+# El aforo máximo del gimnasio NO está aquí: vive en la base de
+# datos (accesos.Instalacion, editable desde el Django Admin) para
+# poder bloquearlo con select_for_update() durante la validación de
+# accesos y evitar condiciones de carrera.
 # ============================================================
+CONGELAMIENTO_DIAS_MIN = config("CONGELAMIENTO_DIAS_MIN", default=7, cast=int)
+CONGELAMIENTO_DIAS_MAX = config("CONGELAMIENTO_DIAS_MAX", default=60, cast=int)
+CANCELACION_MINUTOS_LIMITE = config("CANCELACION_MINUTOS_LIMITE", default=60, cast=int)
+
+
+# ============================================================
+# BLOQUE 8 — MODELO DE USUARIO PERSONALIZADO
+# Usuario con campo "rol"; is_staff se sincroniza solo para
+# ADMINISTRADOR (ver usuarios/models.py). Se define ahora, antes de
+# aplicar ninguna migración real, para no migrar el usuario a mitad
+# de camino.
+# ============================================================
+AUTH_USER_MODEL = "usuarios.Usuario"
+
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -287,7 +310,7 @@ USE_TZ = True
 # BLOQUE 13 — ARCHIVOS ESTÁTICOS Y ALMACENAMIENTO
 # ============================================================
 STATIC_URL = "static/"
-STATICFILES_DIRS = [BASE_DIR / "static"] if (BASE_DIR / "static").exists() else []
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "media/"

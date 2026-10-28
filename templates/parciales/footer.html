@@ -1,0 +1,32 @@
+{% comment %} ============================================================
+   parciales/footer.html — PIE DE PÁGINA
+   Muestra en TODAS las pantallas el nombre de la alumna (criterio
+   de la pauta). El dato llega del context processor
+   core.context_processors.datos_alumno, nunca escrito a mano aquí.
+   ============================================================ {% endcomment %}
+<footer class="pie-fl">
+  <div class="container">
+    <div class="row align-items-center gy-2">
+
+      <div class="col-lg-7">
+        <p class="firma">
+          <i class="bi bi-mortarboard me-1" aria-hidden="true"></i>
+          <strong>{{ alumno_nombre }}</strong>
+        </p>
+        <p class="firma texto-tenue mt-1">
+          {{ nombre_comercial }} · Desarrollo Backend · Evaluación EVA-3
+        </p>
+      </div>
+
+      <div class="col-lg-5">
+        <div class="enlaces justify-content-lg-end">
+          <a href="/api/docs/">
+            <i class="bi bi-braces" aria-hidden="true"></i>
+            <span>API (Swagger)</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</footer>

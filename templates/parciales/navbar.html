@@ -1,0 +1,83 @@
+{% comment %} ============================================================
+   parciales/navbar.html — BARRA DE NAVEGACIÓN
+   Los enlaces de cada módulo (socios, membresías, accesos, clases,
+   aforo) se agregan aquí mismo en la fase en que se crea ese módulo,
+   dentro del bloque "ENLACES POR ROL" de más abajo.
+   ============================================================ {% endcomment %}
+<nav class="navbar navbar-expand-lg navbar-fl">
+  <div class="container">
+    <a class="navbar-brand" href="{% url 'core:inicio' %}">
+      <span class="marca-icono"><i class="bi bi-activity" aria-hidden="true"></i></span>
+      {{ nombre_comercial }}
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navegacionPrincipal"
+            aria-controls="navegacionPrincipal" aria-expanded="false" aria-label="Mostrar navegación">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navegacionPrincipal">
+      <ul class="navbar-nav me-auto">
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'core:panel' %}">
+              <i class="bi bi-speedometer2" aria-hidden="true"></i> Mi panel
+            </a>
+          </li>
+
+          {# ===== ENLACES POR ROL ===== #}
+          {% if user.es_socio %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'socio-mi-qr' %}"><i class="bi bi-qr-code" aria-hidden="true"></i> Mi QR</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'clases-lista' %}"><i class="bi bi-calendar2-week" aria-hidden="true"></i> Clases</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'mis-reservas' %}"><i class="bi bi-calendar-check" aria-hidden="true"></i> Mis reservas</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'membresias-lista' %}"><i class="bi bi-card-checklist" aria-hidden="true"></i> Mi membresía</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'acceso-mi-historial' %}"><i class="bi bi-door-open" aria-hidden="true"></i> Mis accesos</a></li>
+          {% endif %}
+
+          {% if user.es_instructor %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'mis-clases' %}"><i class="bi bi-easel" aria-hidden="true"></i> Mis clases</a></li>
+          {% endif %}
+
+          {% if user.es_recepcion or user.es_administrador %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'socios-lista' %}"><i class="bi bi-people" aria-hidden="true"></i> Socios</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'pagos-lista' %}"><i class="bi bi-cash-coin" aria-hidden="true"></i> Pagos</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'membresias-lista' %}"><i class="bi bi-card-checklist" aria-hidden="true"></i> Membresías</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'acceso-validar-pantalla' %}"><i class="bi bi-qr-code-scan" aria-hidden="true"></i> Validar acceso</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'aforo-dashboard' %}"><i class="bi bi-speedometer2" aria-hidden="true"></i> Aforo</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'clases-lista' %}"><i class="bi bi-calendar2-week" aria-hidden="true"></i> Clases</a></li>
+          {% endif %}
+
+          {% if user.es_administrador %}
+            <li class="nav-item"><a class="nav-link" href="{% url 'planes-lista' %}"><i class="bi bi-card-list" aria-hidden="true"></i> Planes</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'tipos-clase-lista' %}"><i class="bi bi-tags" aria-hidden="true"></i> Tipos de clase</a></li>
+            <li class="nav-item"><a class="nav-link" href="/admin/"><i class="bi bi-gear" aria-hidden="true"></i> Admin</a></li>
+          {% endif %}
+        {% endif %}
+      </ul>
+
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        {% if user.is_authenticated %}
+          <li class="nav-item">
+            <span class="badge-fl badge-rol-{{ user.rol|lower }} me-2">
+              {{ user.get_rol_display }}
+            </span>
+          </li>
+          <li class="nav-item">
+            <form method="post" action="{% url 'usuarios:logout' %}" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="nav-link border-0 bg-transparent">
+                <i class="bi bi-box-arrow-right" aria-hidden="true"></i> Cerrar sesión
+              </button>
+            </form>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'usuarios:login' %}">
+              <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Iniciar sesión
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>

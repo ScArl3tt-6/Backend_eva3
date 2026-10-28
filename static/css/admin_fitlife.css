@@ -1,0 +1,58 @@
+/* ============================================================
+   admin_fitlife.css — PIEL DEL DJANGO ADMIN CON LA PALETA FITLIFE
+   Se carga DESPUÉS del CSS propio de Django (ver
+   templates/admin/base_site.html), así que basta con redefinir las
+   variables que el Admin ya usa internamente; no se reescriben los
+   componentes uno por uno.
+   ============================================================ */
+:root {
+  --primary: #4c63d2;
+  --primary-fg: #ffffff;
+  --secondary: #6f5fc0;
+  --accent: #58c4c0;
+
+  --link-fg: #4c63d2;
+  --link-hover-color: #3a4eae;
+  --link-selected-fg: #3a4eae;
+
+  --header-color: #ffffff;
+  --header-bg: #3a4eae;
+  --header-link-color: #ffffff;
+  --header-branding-color: #ffffff;
+
+  --button-bg: #4c63d2;
+  --button-hover-bg: #3a4eae;
+  --default-button-bg: #4c63d2;
+  --default-button-hover-bg: #3a4eae;
+
+  --object-tools-bg: #6f5fc0;
+  --object-tools-hover-bg: #3a4eae;
+
+  --breadcrumbs-bg: #e9edfc;
+  --breadcrumbs-fg: #2e3350;
+  --breadcrumbs-link-fg: #3a4eae;
+
+  --selected-bg: #e9edfc;
+  --selected-row: #f1eefc;
+}
+
+#site-name a {
+  color: var(--header-link-color);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.module caption, .module h2 {
+  background: var(--secondary);
+}
+
+div.breadcrumbs {
+  background: var(--breadcrumbs-bg);
+  color: var(--breadcrumbs-fg);
+}
+
+div.breadcrumbs a {
+  color: var(--breadcrumbs-link-fg);
+}

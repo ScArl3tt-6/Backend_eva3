@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block titulo %}Iniciar sesión · {{ nombre_comercial }}{% endblock %}
+{% block encabezado %}{% endblock %}
+{% block contenido %}
+
+<div class="row justify-content-center">
+  <div class="col-md-6 col-lg-5">
+    <div class="tarjeta">
+      <div class="tarjeta-cuerpo">
+        <div class="text-center mb-3">
+          <span class="marca-icono mb-2" style="width:52px;height:52px;font-size:1.5rem;">
+            <i class="bi bi-activity" aria-hidden="true"></i>
+          </span>
+          <h1 class="h4 mt-2 mb-0">Iniciar sesión</h1>
+          <p class="texto-suave texto-chico">{{ nombre_comercial }}</p>
+        </div>
+
+        {% if form.errors %}
+          <div class="alert alert-danger">
+            <i class="bi bi-exclamation-octagon-fill" aria-hidden="true"></i>
+            <div>Usuario o contraseña incorrectos.</div>
+          </div>
+        {% endif %}
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label" for="{{ form.username.id_for_label }}">Usuario</label>
+            {{ form.username }}
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="{{ form.password.id_for_label }}">Contraseña</label>
+            {{ form.password }}
+          </div>
+          <input type="hidden" name="next" value="{{ next }}">
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-box-arrow-in-right" aria-hidden="true"></i> Entrar
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="tarjeta mb-3">
+  <div class="tarjeta-cuerpo">
+    <p class="texto-suave mb-1">Sesión iniciada como</p>
+    <h2 class="mb-2">{{ user.get_full_name|default:user.username }}</h2>
+    <span class="badge-fl badge-rol-{{ user.rol|lower }}">{{ user.get_rol_display }}</span>
+  </div>
+</div>
+
+{% if user.es_socio %}
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="tarjeta h-100">
+        <div class="tarjeta-cabecera"><h3><i class="bi bi-card-checklist" aria-hidden="true"></i> Mi membresía</h3></div>
+        <div class="tarjeta-cuerpo">
+          {% if membresia %}
+            <span class="badge-fl badge-membresia-{{ membresia.estado|lower }} mb-2 d-inline-block">{{ membresia.get_estado_display }}</span>
+            <p class="dato-valor">{{ membresia.plan.nombre }} — vence el {{ membresia.fecha_fin }}</p>
+          {% else %}
+            <p class="texto-suave">No tienes una membresía activa. Acércate a recepción para activarla.</p>
+          {% endif %}
+          <a href="{% url 'socio-mi-qr' %}" class="btn btn-sm btn-light-fl mt-2"><i class="bi bi-qr-code" aria-hidden="true"></i> Ver mi QR</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="tarjeta h-100">
+        <div class="tarjeta-cabecera"><h3><i class="bi bi-calendar-check" aria-hidden="true"></i> Próximas reservas</h3></div>
+        <div class="tarjeta-cuerpo">
+          {% for reserva in proximas_reservas %}
+            <p class="mb-1">{{ reserva.clase.tipo.nombre }} — {{ reserva.clase.inicio|date:"d-m-Y H:i" }}
+              <span class="badge-fl badge-reserva-{{ reserva.estado|lower }}">{{ reserva.get_estado_display }}</span></p>
+          {% empty %}
+            <p class="texto-suave">No tienes reservas próximas.</p>
+          {% endfor %}
+          <a href="{% url 'clases-lista' %}" class="btn btn-sm btn-light-fl mt-2">Ver clases</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% elif user.es_instructor %}
+  <div class="tarjeta">
+    <div class="tarjeta-cabecera"><h3><i class="bi bi-easel" aria-hidden="true"></i> Mis próximas clases</h3></div>
+    <div class="tarjeta-cuerpo">
+      {% for clase in proximas_clases %}
+        <p class="mb-1">{{ clase.tipo.nombre }} — {{ clase.inicio|date:"d-m-Y H:i" }} ({{ clase.sala }})</p>
+      {% empty %}
+        <p class="texto-suave">No tienes clases próximas asignadas.</p>
+      {% endfor %}
+      <a href="{% url 'mis-clases' %}" class="btn btn-sm btn-light-fl mt-2">Ver todas mis clases</a>
+    </div>
+  </div>
+{% elif user.es_recepcion or user.es_administrador %}
+  <div class="row g-3">
+    <div class="col-md-4">
+      <div class="tarjeta h-100">
+        <div class="tarjeta-cuerpo text-center">
+          <p class="dato-etiqueta">Ocupación actual</p>
+          <p class="precio-grande">{{ ocupacion_actual }}/{{ aforo_maximo }}</p>
+          <a href="{% url 'aforo-dashboard' %}" class="btn btn-sm btn-light-fl">Ver dashboard</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="tarjeta h-100">
+        <div class="tarjeta-cuerpo text-center">
+          <p class="dato-etiqueta">Socios</p>
+          <p class="precio-grande">{{ total_socios }}</p>
+          <a href="{% url 'socios-lista' %}" class="btn btn-sm btn-light-fl">Ver socios</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="tarjeta h-100">
+        <div class="tarjeta-cuerpo text-center">
+          <p class="dato-etiqueta">Clases de hoy</p>
+          <p class="precio-grande">{{ clases_de_hoy|length }}</p>
+          <a href="{% url 'clases-lista' %}" class="btn btn-sm btn-light-fl">Ver clases</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+{% endblock %}
