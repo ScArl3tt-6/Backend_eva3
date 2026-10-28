@@ -21,3 +21,26 @@ class ValidarAccesoInputSerializer(serializers.Serializer):
 
     token = serializers.CharField()
     tipo = serializers.ChoiceField(choices=TipoAcceso.choices)
+
+
+class ClaseResumenAforoSerializer(serializers.Serializer):
+    """Resumen de una clase de hoy para el dashboard de aforo."""
+
+    id = serializers.IntegerField()
+    tipo = serializers.CharField()
+    instructor = serializers.CharField()
+    inicio = serializers.DateTimeField()
+    cupo_maximo = serializers.IntegerField()
+    cupos_confirmados = serializers.IntegerField()
+    en_lista_de_espera = serializers.IntegerField()
+
+
+class AforoSerializer(serializers.Serializer):
+    """Salida de GET /api/aforo/: lo que consume el dashboard con fetch cada 5s."""
+
+    ocupacion_actual = serializers.IntegerField()
+    capacidad = serializers.IntegerField()
+    porcentaje = serializers.IntegerField()
+    ultimos_accesos = RegistroAccesoSerializer(many=True)
+    denegados_hoy = RegistroAccesoSerializer(many=True)
+    clases_hoy = ClaseResumenAforoSerializer(many=True)

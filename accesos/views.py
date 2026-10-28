@@ -2,6 +2,7 @@
 # accesos/views.py — VALIDACIÓN DE ACCESO Y DASHBOARD DE AFORO (API)
 # ============================================================
 from django.utils import timezone
+from drf_spectacular.utils import extend_schema
 from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -11,7 +12,7 @@ from clases.models import Clase
 from usuarios.permisos import EsAdministradorORecepcion
 
 from .models import Instalacion, RegistroAcceso, ResultadoAcceso
-from .serializers import RegistroAccesoSerializer, ValidarAccesoInputSerializer
+from .serializers import AforoSerializer, RegistroAccesoSerializer, ValidarAccesoInputSerializer
 from .servicios import ocupacion_actual, validar_acceso
 
 
@@ -37,6 +38,7 @@ class ValidarAccesoView(APIView):
 
     permission_classes = [IsAuthenticated, EsAdministradorORecepcion]
 
+    @extend_schema(request=ValidarAccesoInputSerializer, responses=RegistroAccesoSerializer)
     def post(self, request):
         entrada = ValidarAccesoInputSerializer(data=request.data)
         entrada.is_valid(raise_exception=True)
@@ -53,6 +55,7 @@ class AforoView(APIView):
 
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(responses=AforoSerializer)
     def get(self, request):
         instalacion = Instalacion.obtener()
         ocupacion = ocupacion_actual()
