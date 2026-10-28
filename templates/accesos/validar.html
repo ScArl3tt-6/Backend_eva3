@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="tarjeta">
+      <div class="tarjeta-cabecera"><h2><i class="bi bi-qr-code-scan" aria-hidden="true"></i> Escanear código QR</h2></div>
+      <div class="tarjeta-cuerpo">
+        <div id="lector-qr" style="width:100%;"></div>
+        <p class="texto-tenue texto-mini mt-2">
+          La cámara requiere HTTPS (o localhost) y permiso del navegador. Si no hay cámara disponible, use el campo manual.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="tarjeta">
+      <div class="tarjeta-cabecera"><h2><i class="bi bi-keyboard" aria-hidden="true"></i> Ingreso manual</h2></div>
+      <div class="tarjeta-cuerpo">
+        {% if resultado %}
+          <div class="alert alert-{% if resultado.resultado == 'PERMITIDO' %}success{% else %}danger{% endif %}">
+            <i class="bi {% if resultado.resultado == 'PERMITIDO' %}bi-check-circle-fill{% else %}bi-x-circle-fill{% endif %}" aria-hidden="true"></i>
+            <div>
+              <strong>{{ resultado.get_resultado_display }}</strong> — {{ resultado.get_tipo_display }}
+              {% if resultado.socio %}de {{ resultado.socio }}{% endif %}
+              {% if resultado.motivo %}<br>{{ resultado.motivo }}{% endif %}
+            </div>
+          </div>
+        {% endif %}
+
+        <form method="post" id="formulario-validar">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label" for="campo-token">Token</label>
+            <input type="text" name="token" id="campo-token" class="form-control" placeholder="Se completa al escanear, o escríbalo aquí" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="campo-tipo">Tipo</label>
+            <select name="tipo" id="campo-tipo" class="form-select">
+              <option value="ENTRADA">Entrada</option>
+              <option value="SALIDA">Salida</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="bi bi-check-lg" aria-hidden="true"></i> Validar
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tarjeta mt-3">
+  <div class="tarjeta-cabecera"><h3><i class="bi bi-list-ul" aria-hidden="true"></i> Últimos accesos</h3></div>
+  <div class="tarjeta-cuerpo">
+    <div class="tabla-responsiva">
+      <table class="tabla-fl">
+        <thead><tr><th>Socio</th><th>Tipo</th><th>Resultado</th><th>Motivo</th><th>Hora</th></tr></thead>
+        <tbody>
+          {% for acceso in ultimos %}
+            <tr>
+              <td>{{ acceso.socio|default:"—" }}</td>
+              <td>{{ acceso.get_tipo_display }}</td>
+              <td><span class="badge-fl badge-acceso-{{ acceso.resultado|lower }}">{{ acceso.get_resultado_display }}</span></td>
+              <td>{{ acceso.motivo|default:"—" }}</td>
+              <td>{{ acceso.fecha_hora|date:"d-m-Y H:i" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts_extra %}
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (typeof Html5Qrcode === "undefined") return;
+    const lector = new Html5Qrcode("lector-qr");
+
+    Html5Qrcode.getCameras().then(function (camaras) {
+      if (!camaras || camaras.length === 0) return;
+      lector.start(
+        camaras[0].id,
+        { fps: 10, qrbox: 220 },
+        function (textoDecodificado) {
+          document.getElementById("campo-token").value = textoDecodificado;
+          document.getElementById("formulario-validar").submit();
+        },
+        function () { /* sin lectura en este cuadro: se ignora */ }
+      );
+    }).catch(function () { /* sin cámara disponible: queda el campo manual */ });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block bajada %}<p class="bajada">Se actualiza solo, cada 5 segundos, sin recargar la página.</p>{% endblock %}
+{% block contenido %}
+
+<div class="row g-3">
+  <div class="col-md-4">
+    <div class="tarjeta">
+      <div class="tarjeta-cuerpo text-center">
+        <p class="dato-etiqueta">Ocupación actual</p>
+        <p class="precio-grande" id="cifra-ocupacion">—</p>
+        <p class="texto-suave texto-chico" id="texto-capacidad"></p>
+        <div class="medidor-aforo mt-2">
+          <div class="relleno nivel-bajo" id="barra-aforo" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-8">
+    <div class="tarjeta">
+      <div class="tarjeta-cabecera"><h3><i class="bi bi-calendar2-week" aria-hidden="true"></i> Clases de hoy</h3></div>
+      <div class="tarjeta-cuerpo" id="lista-clases-hoy"><p class="texto-suave">Cargando…</p></div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="tarjeta">
+      <div class="tarjeta-cabecera"><h3><i class="bi bi-arrow-left-right" aria-hidden="true"></i> Últimos accesos</h3></div>
+      <div class="tarjeta-cuerpo" id="lista-ultimos-accesos"><p class="texto-suave">Cargando…</p></div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="tarjeta">
+      <div class="tarjeta-cabecera"><h3><i class="bi bi-x-octagon" aria-hidden="true"></i> Denegados hoy</h3></div>
+      <div class="tarjeta-cuerpo" id="lista-denegados"><p class="texto-suave">Cargando…</p></div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+{% block scripts_extra %}
+<script>
+  function escapar(texto) {
+    const div = document.createElement("div");
+    div.textContent = texto == null ? "" : texto;
+    return div.innerHTML;
+  }
+
+  async function actualizarAforo() {
+    try {
+      const respuesta = await fetch("/api/aforo/", { headers: { "Accept": "application/json" } });
+      if (!respuesta.ok) return;
+      const datos = await respuesta.json();
+
+      document.getElementById("cifra-ocupacion").textContent = datos.ocupacion_actual;
+      document.getElementById("texto-capacidad").textContent = `de ${datos.capacidad} (${datos.porcentaje}%)`;
+
+      const barra = document.getElementById("barra-aforo");
+      const porcentaje = Math.min(datos.porcentaje, 100);
+      barra.style.width = porcentaje + "%";
+      barra.className = "relleno " + (datos.porcentaje < 70 ? "nivel-bajo" : datos.porcentaje < 100 ? "nivel-medio" : "nivel-alto");
+
+      const contenedorClases = document.getElementById("lista-clases-hoy");
+      contenedorClases.innerHTML = datos.clases_hoy.length ? "" : '<p class="texto-suave">No hay clases programadas para hoy.</p>';
+      datos.clases_hoy.forEach(function (clase) {
+        const hora = new Date(clase.inicio).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" });
+        contenedorClases.insertAdjacentHTML("beforeend",
+          `<p class="mb-2"><strong>${escapar(clase.tipo)}</strong> — ${escapar(clase.instructor)}<br>
+           <span class="texto-chico texto-suave">${hora} · ${clase.cupos_confirmados}/${clase.cupo_maximo} cupos,
+           ${clase.en_lista_de_espera} en espera</span></p>`);
+      });
+
+      const contenedorAccesos = document.getElementById("lista-ultimos-accesos");
+      contenedorAccesos.innerHTML = datos.ultimos_accesos.length ? "" : '<p class="texto-suave">Sin accesos todavía.</p>';
+      datos.ultimos_accesos.forEach(function (acceso) {
+        contenedorAccesos.insertAdjacentHTML("beforeend",
+          `<p class="mb-1 texto-chico">${escapar(acceso.socio_nombre || "Token desconocido")} — ${escapar(acceso.tipo)} —
+           <span class="badge-fl badge-acceso-${acceso.resultado.toLowerCase()}">${escapar(acceso.resultado)}</span></p>`);
+      });
+
+      const contenedorDenegados = document.getElementById("lista-denegados");
+      contenedorDenegados.innerHTML = datos.denegados_hoy.length ? "" : '<p class="texto-suave">Sin accesos denegados hoy.</p>';
+      datos.denegados_hoy.forEach(function (acceso) {
+        contenedorDenegados.insertAdjacentHTML("beforeend",
+          `<p class="mb-1 texto-chico">${escapar(acceso.socio_nombre || "Token desconocido")} — ${escapar(acceso.motivo)}</p>`);
+      });
+    } catch (error) {
+      console.error("No se pudo actualizar el aforo:", error);
+    }
+  }
+
+  actualizarAforo();
+  setInterval(actualizarAforo, 5000);
+</script>
+{% endblock %}

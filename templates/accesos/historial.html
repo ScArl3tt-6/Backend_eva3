@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block contenido %}
+
+<div class="tarjeta">
+  <div class="tarjeta-cabecera"><h2><i class="bi bi-door-open" aria-hidden="true"></i> {{ titulo_pagina }}</h2></div>
+  <div class="tarjeta-cuerpo">
+    {% if accesos %}
+      <div class="tabla-responsiva">
+        <table class="tabla-fl">
+          <thead><tr><th>Tipo</th><th>Resultado</th><th>Motivo</th><th>Fecha y hora</th></tr></thead>
+          <tbody>
+            {% for acceso in accesos %}
+              <tr>
+                <td>{{ acceso.get_tipo_display }}</td>
+                <td><span class="badge-fl badge-acceso-{{ acceso.resultado|lower }}">{{ acceso.get_resultado_display }}</span></td>
+                <td>{{ acceso.motivo|default:"—" }}</td>
+                <td>{{ acceso.fecha_hora|date:"d-m-Y H:i" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="estado-vacio">
+        <i class="bi bi-door-open icono" aria-hidden="true"></i>
+        <h3>No hay accesos registrados</h3>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
