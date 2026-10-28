@@ -64,7 +64,20 @@ if DETRAS_DE_PROXY_HTTPS:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    # Nginx ya atiende HTTPS; esto hace que Django mismo rediriji cualquier
+    # petición que de todos modos le llegara por HTTP (por ejemplo, si
+    # alguien pega la IP sin "https://"), en vez de responderla igual.
+    SECURE_SSL_REDIRECT = True
     SECURE_HSTS_SECONDS = 3600
+    # SECURE_HSTS_INCLUDE_SUBDOMAINS y SECURE_HSTS_PRELOAD quedan SIN
+    # activar a propósito: el dominio es un subdominio de DuckDNS
+    # (hardpoint-genesis.duckdns.org), un servicio gratuito y compartido
+    # por miles de proyectos bajo "duckdns.org". "includeSubDomains"
+    # forzaría HTTPS en cualquier OTRO subdominio de duckdns.org que
+    # alguien más registre y el navegador ya hubiera visitado este;
+    # "preload" lo mandaría a una lista global que no se puede revertir
+    # rápido si el dominio se diera de baja. Ninguna de las dos
+    # corresponde en un dominio que no es propio. Ver GUIA_DEFENSA.md.
 
 
 # ============================================================
@@ -197,12 +210,21 @@ AUTH_PASSWORD_VALIDATORS = [
 # BLOQUE 8-B — SESIÓN Y LOGIN
 # TODA la aplicación web exige sesión iniciada salvo la portada
 # pública y el login (criterio de seguridad de la pauta).
-# SESSION_COOKIE_AGE es configurable por .env.
+#
+# SESSION_COOKIE_AGE es corto (30 minutos por omisión) porque
+# recepción y las pantallas de validación de acceso suelen quedar en
+# un equipo compartido junto al torniquete/mesón: no conviene que una
+# sesión de recepción quede abierta horas si alguien se aleja.
+# SESSION_SAVE_EVERY_REQUEST=True hace que esos 30 minutos se cuenten
+# desde la ÚLTIMA actividad, no desde el login: mientras recepción
+# sigue usando el sistema, la sesión se renueva sola; si deja el
+# equipo quieto 30 minutos, se cierra.
 # ============================================================
 LOGIN_URL = "/cuentas/login/"
 LOGIN_REDIRECT_URL = "/panel/"
 LOGOUT_REDIRECT_URL = "/"
-SESSION_COOKIE_AGE = config("SESSION_COOKIE_AGE", default=1209600, cast=int)
+SESSION_COOKIE_AGE = config("SESSION_COOKIE_AGE", default=1800, cast=int)
+SESSION_SAVE_EVERY_REQUEST = True
 
 
 # ============================================================

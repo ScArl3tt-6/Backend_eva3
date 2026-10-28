@@ -88,7 +88,14 @@ Cada una tiene CRUD web (`views_html.py` + `templates/<app>/`) y CRUD API
 
 - Autenticación: `usuarios/urls.py` usa `LoginView`/`LogoutView` de Django
   (el `LogoutView` de Django 4.1+ solo acepta `POST`, tal como exige la
-  pauta). Sesión configurable por `SESSION_COOKIE_AGE`.
+  pauta). Sesión de 30 minutos (`SESSION_COOKIE_AGE`, configurable por
+  `.env`) que se renueva con cada petición (`SESSION_SAVE_EVERY_REQUEST
+  = True`, fijo en `settings.py`): se cuenta desde la última actividad,
+  no desde el login. Se eligió un plazo corto a propósito porque
+  recepción y la pantalla de validación de acceso suelen quedar abiertas
+  en un equipo compartido, junto al mesón o al torniquete; si la persona
+  se aleja, conviene que la sesión se cierre sola en media hora en vez de
+  quedar disponible para cualquiera que pase.
 - Toda la web exige login salvo `core:inicio` y `usuarios:login`
   (`core/utilidades.py`, decorador `requiere_rol`, usado en casi todas
   las vistas de `views_html.py`).
@@ -217,11 +224,21 @@ credenciales de demostración.
     Le dice a Django qué orígenes HTTPS puede confiar para el encabezado
     `Origin` al validar CSRF; sin él, los formularios fallarían detrás de
     un proxy que cambia de HTTP a HTTPS.
-19. **¿Qué hace `DETRAS_DE_PROXY_HTTPS`?**
-    Activa `SECURE_PROXY_SSL_HEADER`, `SESSION_COOKIE_SECURE` y
-    `CSRF_COOKIE_SECURE`: le dice a Django que confíe en el encabezado
+19. **¿Qué hace `DETRAS_DE_PROXY_HTTPS` y por qué no activa HSTS completo?**
+    Activa `SECURE_PROXY_SSL_HEADER` (para que Django confíe en el
     `X-Forwarded-Proto` que agrega Nginx, porque Gunicorn recibe la
-    conexión por HTTP aunque el navegador use HTTPS.
+    conexión por HTTP aunque el navegador use HTTPS), `SESSION_COOKIE_SECURE`,
+    `CSRF_COOKIE_SECURE`, `SECURE_SSL_REDIRECT` (para que Django mismo
+    redirija a HTTPS cualquier petición que de todos modos le llegara por
+    HTTP) y `SECURE_HSTS_SECONDS=3600`. Deja **sin activar**
+    `SECURE_HSTS_INCLUDE_SUBDOMAINS` y `SECURE_HSTS_PRELOAD` a propósito:
+    el dominio (`hardpoint-genesis.duckdns.org`) es un subdominio de
+    DuckDNS, un servicio gratuito compartido por miles de proyectos bajo
+    `duckdns.org`. "includeSubDomains" forzaría HTTPS en cualquier otro
+    subdominio de `duckdns.org` que el navegador ya hubiera visitado;
+    "preload" inscribiría el dominio en una lista global del navegador
+    que no se puede revertir con rapidez. Ninguna de las dos corresponde
+    en un dominio que no es propio de FitLife.
 20. **¿Por qué el proyecto no usa SQLite?**
     Porque la pauta exige PostgreSQL como motor íntegro, y porque
     `CheckConstraint`/`UniqueConstraint` condicionales necesitan un motor
