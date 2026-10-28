@@ -7,6 +7,8 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.utils import timezone
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from rest_framework.permissions import IsAuthenticated
 
 
 def inicio(request):
@@ -66,3 +68,22 @@ def panel(request):
         )
 
     return render(request, "core/panel.html", contexto)
+
+
+# ============================================================
+# DOCUMENTACIÓN DE LA API, PROTEGIDA CON SESIÓN INICIADA
+# El esquema OpenAPI completo (rutas, modelos, hasta los nombres de
+# los campos) no es información pública: exige autenticación igual
+# que el resto de la API (sesión de staff o, si se usa fuera del
+# navegador, un JWT válido).
+# ============================================================
+class SpectacularAPIViewProtegida(SpectacularAPIView):
+    permission_classes = [IsAuthenticated]
+
+
+class SpectacularSwaggerViewProtegida(SpectacularSwaggerView):
+    permission_classes = [IsAuthenticated]
+
+
+class SpectacularRedocViewProtegida(SpectacularRedocView):
+    permission_classes = [IsAuthenticated]

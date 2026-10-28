@@ -6,11 +6,11 @@
 # ============================================================
 from django.contrib import admin
 from django.urls import include, path
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 from accesos import urls as accesos_urls
 from clases import urls as clases_urls
 from core import urls as core_urls
+from core.views import SpectacularAPIViewProtegida, SpectacularRedocViewProtegida, SpectacularSwaggerViewProtegida
 from membresias import urls as membresias_urls
 from socios import urls as socios_urls
 from usuarios import urls as usuarios_urls
@@ -37,10 +37,10 @@ rutas_html = (
 )
 
 urlpatterns = [
-    # --- Documentación OpenAPI 3 ---
-    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
-    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
-    path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+    # --- Documentación OpenAPI 3 (exige sesión iniciada: no es información pública) ---
+    path("api/schema/", SpectacularAPIViewProtegida.as_view(), name="schema"),
+    path("api/docs/", SpectacularSwaggerViewProtegida.as_view(url_name="schema"), name="swagger-ui"),
+    path("api/redoc/", SpectacularRedocViewProtegida.as_view(url_name="schema"), name="redoc"),
     # --- API REST ---
     path("api/", include((rutas_api, "api"))),
     # --- Django Admin ---
