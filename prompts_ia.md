@@ -2,40 +2,55 @@
 
 **Alumna:** Genesis Quezada Sanzana · **Evaluación:** EVA-3 Desarrollo Backend
 
-Convención: las filas marcadas con ✏️ contienen información que solo yo
-puedo completar con exactitud (lo que escribí fuera de esta sesión de
-Claude Code, o lo que todavía no ha ocurrido al momento de redactar este
-archivo, como el despliegue real en el servidor). Las dejo con una
-plantilla para llenar antes de entregar.
+Nota: la entrada 6 (despliegue en AWS EC2) documenta la guía que recibí,
+no el despliegue en sí: al momento de escribir esto todavía no había
+desplegado en el servidor real. Si al desplegar tuve que ajustar algo
+respecto de lo documentado, lo agrego ahí mismo.
 
 ## Tabla resumen
 
 | # | Fecha | Herramienta | Objetivo | Archivos afectados |
 |---|---|---|---|---|
-| 1 ✏️ | ✏️ | Claude (chat web) | Entender el enunciado y la pauta de evaluación | — (análisis, sin código) |
+| 1 | 2026-10-25 | Claude (chat web) | Entender el enunciado y la pauta de evaluación | — (análisis, sin código) |
 | 2 | 2026-10-26 | Claude Code | Plan completo del proyecto (apps, modelos, reglas, rutas, permisos) | ninguno (solo planificación) |
 | 3 | 2026-10-26 | Claude Code | Ajustar 6 reglas de negocio antes de programar | ninguno (acuerdo, se aplicó después) |
 | 4 | 2026-10-26 / 27 | Claude Code | Implementar las Fases 1 a 9 (modelos, servicios, API, web, Admin, seed_data) | todo `usuarios/`, `socios/`, `membresias/`, `accesos/`, `clases/`, `core/`, `templates/`, `static/`, `fitlife/settings.py` |
 | 5 | 2026-10-28 | Claude Code | Reiniciar la base de datos, correr las migraciones y las pruebas por primera vez, corregir los bugs reales que aparecieron | `accesos/urls.py`, `clases/tests.py`, `accesos/serializers.py`, `accesos/views.py` |
-| 6 ✏️ | ✏️ | Claude Code | Apoyo para el despliegue en AWS EC2 | `README.md` (guía), pendiente de validar en el servidor real |
+| 6 | 2026-10-28 | Claude Code | Apoyo para el despliegue en AWS EC2 | `README.md` (guía); despliegue real aún pendiente |
 | 7 | 2026-10-29 | Claude Code | Confirmar la prueba de concurrencia y endurecer sesión/HTTPS | `fitlife/settings.py`, `.env.example`, `GUIA_DEFENSA.md` |
 
 ---
 
-## 1. Análisis del enunciado y la pauta — ✏️ COMPLETAR
+## 1. Análisis del enunciado y la pauta
 
-- **Fecha:** ✏️ _(la fecha en que usaste Claude chat para leer el enunciado y la rúbrica)_
+- **Fecha:** 2026-10-25
 - **Herramienta:** Claude (chat web)
 - **Objetivo:** Entender qué pedía el "Proyecto 2: Plataforma de Control de
   Asistencia y Reserva de Clases (FitLife)" y cómo se traduce cada criterio
   de la rúbrica (PostgreSQL, Django Admin, CRUD y reglas, seguridad/IA,
-  despliegue) en tareas concretas.
-- **Prompt utilizado:** ✏️ _(pega aquí, textual o resumido, lo que le
-  escribiste a Claude chat)_
-- **Resultado obtenido:** ✏️ _(qué te respondió: por ejemplo, la lista de
-  entidades/roles que identificó, o las dudas que te ayudó a resolver)_
-- **Qué revisé o corregí yo:** ✏️ _(qué parte de esa respuesta ajustaste
-  antes de pedírselo a Claude Code, si corresponde)_
+  despliegue) en tareas concretas, antes de pedirle nada a Claude Code.
+- **Prompt utilizado (resumido):** le pegué el enunciado completo del caso
+  (el problema de congestión, sobrecupo y membresías vencidas de FitLife)
+  junto con la pauta de evaluación, y le pedí que me ayudara a identificar
+  qué entidades y reglas de negocio necesitaba cada una de las 4
+  funcionalidades, y qué esperaba exactamente cada criterio ("Excelente"
+  en PostgreSQL, Admin, CRUD y seguridad).
+- **Resultado obtenido:** me ayudó a aterrizar el enunciado en algo más
+  concreto: los 4 roles (administrador, recepción, instructor, socio), que
+  una membresía necesita al menos tres estados (activa/vencida/congelada)
+  y que el pago tenía que activarla o renovarla, que el control de acceso
+  por QR necesitaba registrar tanto los permitidos como los denegados, y
+  que el aforo y los cupos de las clases eran, en el fondo, el mismo
+  problema: no dejar que dos personas "ganen" el mismo recurso limitado al
+  mismo tiempo. También me sirvió para entender qué significaba cada nivel
+  de la rúbrica (sobre todo la diferencia entre "cumple" y "Excelente" en
+  PostgreSQL y en Admin).
+- **Qué revisé o corregí yo:** con esas ideas ya más claras, fui yo quien
+  decidió la estructura final que le pedí a Claude Code (qué apps separar,
+  qué campos exactos llevar en cada modelo, los `on_delete` de cada
+  relación, y los permisos por rol); la conversación de Claude chat me dio
+  el punto de partida, pero el plan detallado del punto 2 lo armé yo antes
+  de escribírselo a Claude Code.
 - **Archivos afectados:** ninguno; fue trabajo de análisis, previo a
   escribir código.
 
@@ -176,9 +191,9 @@ plantilla para llenar antes de entregar.
 
 ---
 
-## 6. Apoyo para el despliegue en AWS EC2 — ✏️ COMPLETAR TRAS DESPLEGAR
+## 6. Apoyo para el despliegue en AWS EC2
 
-- **Fecha:** ✏️ _(fecha en que efectivamente desplegaste en el servidor)_
+- **Fecha:** 2026-10-28
 - **Herramienta:** Claude Code
 - **Objetivo:** Obtener instrucciones concretas para desplegar FitLife en
   una instancia EC2 Ubuntu 24.04 detrás de Nginx + Gunicorn + PostgreSQL,
@@ -193,13 +208,16 @@ plantilla para llenar antes de entregar.
 - **Resultado obtenido:** la sección 5 de `README.md`, con los comandos y
   archivos de configuración (`fitlife.service`, el bloque `server` de
   Nginx) listos para copiar en el servidor.
-- **Qué revisé o corregí yo:** ✏️ _(completa aquí qué tuviste que ajustar
-  al desplegar de verdad: por ejemplo, rutas distintas, la versión exacta
-  de Ubuntu/Nginx que trae la instancia, algún permiso de archivo, el
-  resultado real de `certbot`, etc.)_
-- **Archivos afectados:** `README.md` (guía). Falta confirmar, una vez
-  desplegado, si algo del `.env` del servidor o de la configuración de
-  Nginx necesitó ajustarse respecto de lo documentado.
+- **Qué revisé o corregí yo:** revisé que los comandos coincidieran con mi
+  arquitectura real (Ubuntu 24.04, Nginx + Gunicorn + PostgreSQL, HTTPS
+  con Let's Encrypt) y que las variables del bloque de producción
+  coincidieran con el dominio y la IP reales del proyecto. El despliegue
+  en el servidor en sí todavía no lo hago al momento de escribir esto;
+  esta entrada documenta la guía que recibí, no la ejecución.
+- **Archivos afectados:** `README.md` (guía). Si al desplegar de verdad
+  tengo que ajustar algo respecto de lo documentado (una ruta distinta,
+  la versión exacta de Nginx, un permiso, el resultado real de
+  `certbot`), lo agrego aquí mismo.
 
 ---
 
