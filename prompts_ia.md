@@ -18,6 +18,7 @@ plantilla para llenar antes de entregar.
 | 4 | 2026-10-26 / 27 | Claude Code | Implementar las Fases 1 a 9 (modelos, servicios, API, web, Admin, seed_data) | todo `usuarios/`, `socios/`, `membresias/`, `accesos/`, `clases/`, `core/`, `templates/`, `static/`, `fitlife/settings.py` |
 | 5 | 2026-10-28 | Claude Code | Reiniciar la base de datos, correr las migraciones y las pruebas por primera vez, corregir los bugs reales que aparecieron | `accesos/urls.py`, `clases/tests.py`, `accesos/serializers.py`, `accesos/views.py` |
 | 6 ✏️ | ✏️ | Claude Code | Apoyo para el despliegue en AWS EC2 | `README.md` (guía), pendiente de validar en el servidor real |
+| 7 | 2026-10-29 | Claude Code | Confirmar la prueba de concurrencia y endurecer sesión/HTTPS | `fitlife/settings.py`, `.env.example`, `GUIA_DEFENSA.md` |
 
 ---
 
@@ -202,6 +203,42 @@ plantilla para llenar antes de entregar.
 
 ---
 
+## 7. Confirmar la prueba de concurrencia y endurecer sesión/HTTPS
+
+- **Fecha:** 2026-10-29
+- **Herramienta:** Claude Code
+- **Objetivo:** Antes de hacer push, pedí tres cosas: (1) confirmar que la
+  prueba del aforo con dos entradas al mismo tiempo usa el tipo de prueba
+  correcto y de verdad se ejecuta (no se "salta"); (2) acortar la duración
+  de la sesión a 30 minutos, renovándose con la actividad; (3) activar la
+  redirección automática a HTTPS en el servidor, sin exagerar con HSTS en
+  un dominio que no es propio.
+- **Prompt utilizado (resumido):** "Prueba de concurrencia del aforo:
+  confírmame que usa `TransactionTestCase`... Si no, corrígela... Cambia
+  `SESSION_COOKIE_AGE` a 1800 (30 minutos), renovándose con la actividad
+  (`SESSION_SAVE_EVERY_REQUEST=True`)... Cuando
+  `DETRAS_DE_PROXY_HTTPS=True`, activa también `SECURE_SSL_REDIRECT=True`.
+  Deja sin activar HSTS includeSubDomains y preload, y explica por qué...
+  Luego ejecuta otra vez check, check --deploy, makemigrations --check,
+  spectacular --validate y test. Si TODO pasa, haz commit y push."
+- **Resultado obtenido:** Claude Code revisó la prueba existente y
+  confirmó que ya estaba bien escrita (5 corridas seguidas, siempre 1
+  acceso permitido y 1 denegado, sin saltarse); no hizo falta tocarla.
+  Agregó `SESSION_COOKIE_AGE=1800` y `SESSION_SAVE_EVERY_REQUEST=True`, y
+  `SECURE_SSL_REDIRECT=True` junto a `DETRAS_DE_PROXY_HTTPS`. Volvió a
+  correr toda la verificación (86/86 pruebas), hizo el commit y el push a
+  `origin main`.
+- **Qué revisé o corregí yo:** pedí explícitamente la justificación de
+  cada cambio en palabras simples (la sesión corta es por el computador
+  compartido de recepción; no activar HSTS completo es porque el dominio
+  es un subdominio gratuito de DuckDNS, no uno propio) y que no se hiciera
+  push si algo fallaba.
+- **Archivos afectados:** `fitlife/settings.py`, `.env.example`,
+  `GUIA_DEFENSA.md`, y este mismo archivo (`prompts_ia.md`, al notar que
+  esta corrección no había quedado registrada).
+
+---
+
 ## Reflexión
 
 Trabajar con Claude Code de principio a fin obligó a sostener un plan
@@ -225,3 +262,8 @@ sabía de la EVA-2 pero que esta vez viví en carne propia: `check` prueba que
 el código *carga*, no que *funcione*; solo la suite de pruebas (y, antes de
 eso, decidir no debilitarla para que "pasara") demuestra que la lógica de
 negocio hace lo que la pauta exige.
+
+Y una última: este mismo archivo se me olvidó actualizar después de la
+ronda de correcciones de la entrada 7, hasta que revisé la pauta de nuevo.
+La evidencia de uso de IA no es algo que se escribe una vez al final: hay
+que ir anotándola apenas pasa, igual que un commit.
